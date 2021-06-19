@@ -265,7 +265,8 @@ plt.show()
 ```
 
 Running this code will cause the following window to appear:
-[INSERT IMAGE HERE]
+
+![img](images/part_6_1.PNG)
 
 We start by calculating new varialbes called `x_hat` and `y_hat`. The `_hat` suffix is simply there to indicate this is a projected, or predicted version of the original variable.
 
