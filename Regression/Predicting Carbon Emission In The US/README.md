@@ -1,5 +1,5 @@
 # Predicting Carbon Emission In The US
-In this tutorial, we will predict the carbon emissions from the United States of America.
+In this tutorial, we will predict the carbon emissions from the United States of America. The source code for each part can be found in the [GitHub Repository](https://github.com/MLMadeSimple/Python-Machine-Learning-Tutorials/tree/main/Regression/Predicting%20Carbon%20Emission%20In%20The%20US)
 
 ## Contents
 - [Part 1 - The Data](#part-1---the-data)
