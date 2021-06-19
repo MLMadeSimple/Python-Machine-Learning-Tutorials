@@ -42,7 +42,7 @@ Our first job will be to read the data set into memory. This will be done with t
 
 We will also need Numpy, and matplotlib. Pandas, Numpy, and matplotlib are two of the best tools for working with data.
 
-```shell
+```bash
 pip install pandas
 pip install numpy
 pip install matplotlib
