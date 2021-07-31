@@ -1,6 +1,6 @@
 # Predicting Heart Medication for a Patient
 
-In this tutorial, we will predict the heart medication best suited for a patient, given their current condition. 
+In this tutorial, we will predict the heart medication best suited for a patient, given their current condition. We will be trying out, and scoring, many different classification algorithms to see which algorithm yeilds the best results.
 
 **DISCLAIMER**: This project SHOULD NOT be used as medical advice. Please consult a Doctor instead.
 
@@ -90,3 +90,8 @@ df = pd.read_csv("Drug Classification.csv")
 ```
 
 Finally, we printed out the dataframe, but, if you look at the output, we can only see *part* of the dataframe. This is because Pandas will only print the first and last few columns and rows in the dataframe so you can still see everything without lines getting wrapped because of your console size. A larger console size will allow you to see more columns and rows.
+
+## Part 3 - Cleaning the Data
+Before we can proceed, we need to do some cleaning of our data. The SKLearn library does not allow categorical features to be used in predictions. It only allows numerical features to be used. Unfortunatly, our data is mostly categorical data (3 of the 5 features - while there are 6 columns, the last one is our target and was not included in this count)
+
+
