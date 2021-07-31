@@ -8,6 +8,7 @@ The source code for each part can be found in the [GitHub Repository](https://gi
 
 ## Contents
 - [Part 1 - The Data](#part-1---the-data)
+- [Part 2 - Loading Data Into Memory](#part-2---loading-data-into-memory)
 
 ## Part 1 - The Data
 The data set which will be used in this tutorial will come from the user [prathamtripathi](https://www.kaggle.com/prathamtripathi) over on www.kaggle.com and can be found at https://www.kaggle.com/prathamtripathi/drug-classification.
