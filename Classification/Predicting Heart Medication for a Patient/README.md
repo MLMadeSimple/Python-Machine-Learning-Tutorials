@@ -10,6 +10,7 @@ The source code for each part can be found in the [GitHub Repository](https://gi
 - [Part 1 - The Data](#part-1---the-data)
 - [Part 2 - Loading Data Into Memory](#part-2---loading-data-into-memory)
 - [Part 3 - Cleaning the Data](#part-3---cleaning-the-data)
+- [Part 4 - Selecting The Algorithm](#part-4---selecting-the-algorithm)
 
 ## Part 1 - The Data
 The data set which will be used in this tutorial will come from the user [prathamtripathi](https://www.kaggle.com/prathamtripathi) over on www.kaggle.com and can be found at https://www.kaggle.com/prathamtripathi/drug-classification.
@@ -250,3 +251,144 @@ And finally the dataframe is printed out to the console:
 ```python
 print(df)
 ```
+
+## Part 4 - Selecting The Algorithm
+The `sklearn` library provides models for many machine learning algorithms, so which one do we use? There is no one answer to this question. It depends on the data. We can determine which model will fit the data the best by trying a few models, scoring them, and checking which model performs the best. We will be using the following algorithms to test. Note that what these algorithms actually do is outside the scope of this tutorial. If you wish to learn more about how they work, I have written a book on the topic which can be found here: https://www.amazon.com/dp/B08YXWZ4HC.
+
+- k Nearest Neigbours
+- Naive Bayes Classifier
+- Decision Tree Classifier
+- Random Forest Classifier
+- Logistic Regression - Dispite being a regression algorithm, we will be using it as a classifier. Makes sense, right?
+
+Building on the code from `part3_1.py`, we can use the following code to complete this task.
+```python
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.tree import DecisionTreeClassifier
+
+
+def build_model(m):
+    m.fit(X_train, y_train)
+    print(m.score(X_test, y_test))
+    return m
+
+
+df = pd.read_csv("Drug Classification.csv")
+
+columns = ["Sex", "BP", "Cholesterol"]
+
+one_hot_encoder = OneHotEncoder(sparse=False)
+
+one_hot_encoded = one_hot_encoder.fit_transform(df[columns])
+labels = one_hot_encoder.get_feature_names(columns)
+
+for i, label in enumerate(labels):
+    df[label] = one_hot_encoded[:, i]
+
+X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 'Cholesterol_NORMAL', 'Na_to_K']]
+y = df["Drug"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+print("KNeighborsClassifier")
+model = KNeighborsClassifier(n_neighbors=6)
+build_model(model)
+
+print("\nGaussianNB")
+model = GaussianNB()
+build_model(model)
+
+print("\nDecisionTreeClassifier")
+model = DecisionTreeClassifier(max_depth=None)
+build_model(model)
+
+print("\nRandomForestClassifier")
+model = RandomForestClassifier(max_depth=None)
+build_model(model)
+
+print("\nLogisticRegression")
+model = LogisticRegression(max_iter=500)
+build_model(model)
+```
+
+When I ran this code, I got the following output. Note that each time you run the code, the results will vary.
+```
+KNeighborsClassifier
+0.9
+
+GaussianNB
+0.65
+
+DecisionTreeClassifier
+0.875
+
+RandomForestClassifier
+0.85
+
+LogisticRegression
+0.875
+```
+
+In this case, `KNeighborsClassifier` scored the highest, so I would select this algorithm as the one to use.
+
+So what is going on with the code? We start off with some new imports which are not too exciting, but immediatly after we have a new function:
+```python
+def build_model(m):
+    m.fit(X_train, y_train)
+    print(m.score(X_test, y_test))
+    return m
+```
+
+This function takes a model, fits our training data to the model (which we will do very soon), scores the model and prints the score to the console. It also returns the trained model for future use.
+
+After that, there is no change from `3_1.py` for the next bit. The next difference comes at the the following code. This code simply collects our predictor features and stores them in the variable `X`, and takes the target and stores it as `y`. While it is bad practice to use single letter variable names, and variable names should always be lowercase in Python (unless it is a constant), this case is nessisary in order to follow Linear Algebra and Statistics conventions.
+```python
+X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 'Cholesterol_NORMAL', 'Na_to_K']]
+y = df["Drug"]
+```
+
+Next, we split our training and testing data. This process takes a percentage of the data to actually do training on. The rest of the data is used for scoring the model, where we make predictions from our model with the data we already know the target for. The score comes from the percentage of predictions which yeilded the same result as the result we knew. I like to use an 80%/20% split, however, other splits work like 70%/30% and 75%/25%. This step also selects random instances for the training and testing datasets which is why the scores for each model vary so much from each run.
+```python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+```
+
+Finally, for each model, we create an instance of it, and pass the model into our `build_model` function from earlier. In order to create less repetition, I have only included the first `KNeighborsClassifier` model for explanation. You may notice that we are passing in some values into each model when we create it. It would be a good idea to play around with the parameters I included, as well as the ones not included in my code, to see if you can improve the result of the model.
+```python
+print("KNeighborsClassifier")
+model = KNeighborsClassifier(n_neighbors=6)
+build_model(model)
+```
+
+The link for the documentation for each model can be found below which coontains a description of each parameter.
+
+- [k Nearest Neigbours](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
+- [Naive Bayes Classifier](https://scikit-learn.org/stable/modules/naive_bayes.html)
+- [Decision Tree Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
+- [Random Forest Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
+- [Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+
+Once you are happy with all the parameters, run the code a few times and select the model which scores highest the most. When I ran the code again, I got the following result:
+```
+KNeighborsClassifier
+0.8
+
+GaussianNB
+0.675
+
+DecisionTreeClassifier
+0.925
+
+RandomForestClassifier
+0.9
+
+LogisticRegression
+0.875
+```
+
+In my case, I found the `DecisionTreeClassifier` model scored highest most of the time. As a result, I will proceed with this algorithm. You may have a different result based on your parameter coonfiguration. Proceed with whichever model fits your data best.
