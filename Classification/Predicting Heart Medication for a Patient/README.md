@@ -11,6 +11,8 @@ The source code for each part can be found in the [GitHub Repository](https://gi
 - [Part 2 - Loading Data Into Memory](#part-2---loading-data-into-memory)
 - [Part 3 - Cleaning the Data](#part-3---cleaning-the-data)
 - [Part 4 - Selecting The Algorithm](#part-4---selecting-the-algorithm)
+- [Part 5 - Using the Model](#part-5---using-the-model)
+- [Final Code](#final-code)
 
 ## Part 1 - The Data
 The data set which will be used in this tutorial will come from the user [prathamtripathi](https://www.kaggle.com/prathamtripathi) over on www.kaggle.com and can be found at https://www.kaggle.com/prathamtripathi/drug-classification.
@@ -353,7 +355,7 @@ X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 
 y = df["Drug"]
 ```
 
-Next, we split our training and testing data. This process takes a percentage of the data to actually do training on. The rest of the data is used for scoring the model, where we make predictions from our model with the data we already know the target for. The score comes from the percentage of predictions which yeilded the same result as the result we knew. I like to use an 80%/20% split, however, other splits work like 70%/30% and 75%/25%. This step also selects random instances for the training and testing datasets which is why the scores for each model vary so much from each run.
+Next, we split our training and testing data. This process takes a percentage of the data to actually do training on. The rest of the data is used for scoring the model, where we make predictions from our model with the data we already know the target for. The score comes from the percentage of predictions which yeilded the same result as the result we knew. The score will always be a number between 0 and 1 with 0 being the worst and 1 being the best. I like to use an 80%/20% split, however, other splits work like 70%/30% and 75%/25%. This step also selects random instances for the training and testing datasets which is why the scores for each model vary so much from each run.
 ```python
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 ```
@@ -392,3 +394,113 @@ LogisticRegression
 ```
 
 In my case, I found the `DecisionTreeClassifier` model scored highest most of the time. As a result, I will proceed with this algorithm. You may have a different result based on your parameter coonfiguration. Proceed with whichever model fits your data best.
+
+## Part 5 - Using the Model
+If we modify the code from `part4.py` slightly, we can use a model to make predictions. The model which scored the best for me was `DecisionTreeClassifier` so it is the one I have used. Please proceed with the model which scored the best for you, and remember to include the parameters you used when training the model when creating the model in this step.
+```python
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv("Drug Classification.csv")
+
+columns = ["Sex", "BP", "Cholesterol"]
+
+one_hot_encoder = OneHotEncoder(sparse=False)
+
+one_hot_encoded = one_hot_encoder.fit_transform(df[columns])
+labels = one_hot_encoder.get_feature_names(columns)
+
+for i, label in enumerate(labels):
+    df[label] = one_hot_encoded[:, i]
+
+X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 'Cholesterol_NORMAL', 'Na_to_K']]
+y = df["Drug"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = DecisionTreeClassifier(max_depth=None)
+model.fit(X_train, y_train)
+
+print(model.score(X_test, y_test))
+
+print(model.predict([
+    [1, 0, 1, 0, 0, 1, 0, 1.36],
+    [0, 1, 0, 1, 0, 1, 0, 5.6],
+    [1, 0, 0, 0, 1, 0, 1, 8.5],
+    [0, 1, 0, 1, 0, 0, 1, 10.6],
+]))
+```
+
+Running this code gave me the following output:
+```
+0.9
+['drugA' 'drugC' 'drugX' 'drugX']
+```
+
+So what does the code do? Like in `part4.py`, we start by building and scoring our model:
+```python
+model = DecisionTreeClassifier(max_depth=None)
+model.fit(X_train, y_train)
+
+print(model.score(X_test, y_test))
+```
+
+Once that is done, we make a prediction by passing a 2D list. This is because we can make multiple predictions with a single call to `predict`. In my case, I am running 4 predictions. Note that the order of the values we are passing into the predictor is vary important and should be in the same order as the items when we defined `X`:
+```python
+X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 'Cholesterol_NORMAL', 'Na_to_K']]
+```
+
+The prediction returns a list of the predictions in the same order as we passed our instances to the predictor:
+```python
+print(model.predict([
+    [1, 0, 1, 0, 0, 1, 0, 1.36],       # Predicted 'drugA'
+    [0, 1, 0, 1, 0, 1, 0, 5.6],        # Predicted 'drugC'
+    [1, 0, 0, 0, 1, 0, 1, 8.5],        # Predicted 'drugX'
+    [0, 1, 0, 1, 0, 0, 1, 10.6],       # Predicted 'drugX'
+]))
+```
+
+Therefore, our prediction result was 
+```
+['drugA' 'drugC' 'drugX' 'drugX']
+```
+
+## Final Code
+Here is the final code created for this tutorial with everything included (if you selected the `DecisionTreeClassifier` with no additional parameters to build your model from). I hope you enjoyed this tutorial, and learned something from it. Thanks and have a nice day!
+```python
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv("Drug Classification.csv")
+
+columns = ["Sex", "BP", "Cholesterol"]
+
+one_hot_encoder = OneHotEncoder(sparse=False)
+
+one_hot_encoded = one_hot_encoder.fit_transform(df[columns])
+labels = one_hot_encoder.get_feature_names(columns)
+
+for i, label in enumerate(labels):
+    df[label] = one_hot_encoded[:, i]
+
+X = df[['Sex_F', 'Sex_M', 'BP_HIGH', 'BP_LOW', 'BP_NORMAL', 'Cholesterol_HIGH', 'Cholesterol_NORMAL', 'Na_to_K']]
+y = df["Drug"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+model = DecisionTreeClassifier(max_depth=None)
+model.fit(X_train, y_train)
+
+print(model.score(X_test, y_test))
+
+print(model.predict([
+    [1, 0, 1, 0, 0, 1, 0, 1.36],
+    [0, 1, 0, 1, 0, 1, 0, 5.6],
+    [1, 0, 0, 0, 1, 0, 1, 8.5],
+    [0, 1, 0, 1, 0, 0, 1, 10.6],
+]))
+```
