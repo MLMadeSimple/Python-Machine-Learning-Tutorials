@@ -191,3 +191,62 @@ And print the feature names. What we pass in is a prefix to add to the new colum
 ```python
 print(one_hot_encoder.get_feature_names(columns))
 ```
+
+Now that he have encoded our data, we need to add the encoded data back to our original data frame. (see `part3_1.py`), which can be done with the following code:
+```python
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.read_csv("Drug Classification.csv")
+
+columns = ["Sex", "BP", "Cholesterol"]
+
+one_hot_encoder = OneHotEncoder(sparse=False)
+
+one_hot_encoded = one_hot_encoder.fit_transform(df[columns])
+labels = one_hot_encoder.get_feature_names(columns)
+
+for i, label in enumerate(labels):
+    df[label] = one_hot_encoded[:, i]
+    
+print(df)
+```
+
+Running this will yeild the following output:
+
+```
+     Age Sex      BP  ... BP_NORMAL  Cholesterol_HIGH Cholesterol_NORMAL
+0     23   F    HIGH  ...       0.0               1.0                0.0
+1     47   M     LOW  ...       0.0               1.0                0.0
+2     47   M     LOW  ...       0.0               1.0                0.0
+3     28   F  NORMAL  ...       1.0               1.0                0.0
+4     61   F     LOW  ...       0.0               1.0                0.0
+..   ...  ..     ...  ...       ...               ...                ...
+195   56   F     LOW  ...       0.0               1.0                0.0
+196   16   M     LOW  ...       0.0               1.0                0.0
+197   52   M  NORMAL  ...       1.0               1.0                0.0
+198   23   M  NORMAL  ...       1.0               0.0                1.0
+199   40   F     LOW  ...       0.0               0.0                1.0
+
+[200 rows x 13 columns]
+```
+
+Because we are adding these columns to the end, our target variable `Drug` ends up being in the middle of the dataframe, and our categorical features are also still in the dataframe. This is not a problem because we need to explicitly tell `sklearn` which features will be used and which feature is the target.
+
+So what is going on in the code? The code is mostly the same as what can be found in `part3.py`, so I will only go over the differences. The first difference is that instead of printing our encoded labels, we are now saving them to the varialbe `labels`.
+
+```python
+labels = one_hot_encoder.get_feature_names(columns)
+```
+
+Next, for each label, we are adding the ascociated column back to the original dataframe:
+
+```python
+for i, label in enumerate(labels):
+    df[label] = one_hot_encoded[:, i]
+```
+
+And finally the dataframe is printed out to the console:
+```python
+print(df)
+```
