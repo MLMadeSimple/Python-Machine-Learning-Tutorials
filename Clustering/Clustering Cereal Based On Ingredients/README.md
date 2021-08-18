@@ -185,4 +185,88 @@ Name: name, Length: 77, dtype: object
 ```
 
 ## Part 4 - Building the Model
+Now it is finally time to build the model! The following code can be used to acomplish this task.
+```python
+import numpy as np
+import pandas as pd
+from sklearn.cluster import MeanShift, estimate_bandwidth
+
+df = pd.read_csv("cereal.csv")
+
+df.loc[df["type"] == "C", 'type'] = 0
+df.loc[df["type"] == "H", 'type'] = 1
+
+X = df[[
+    "type", "calories", "protein", "fat", "sodium", "fiber", "carbo", "sugars", "potass",
+    "vitamins", "shelf", "weight", "cups"
+]]
+
+y = df["name"]
+
+bandwidth = estimate_bandwidth(X, quantile=0.2, n_samples=500)
+print(bandwidth)
+
+model = MeanShift(bandwidth=bandwidth)
+model.fit(X)
+
+labels = model.labels_
+
+labels_unique = np.unique(labels)
+n_clusters = len(labels_unique)
+
+print(n_clusters)
+
+final_df = df.merge(pd.DataFrame(labels, columns=["result"]), left_index=True, right_index=True)
+final_df.to_csv("cereal_prediction.csv")
+```
+
+When I ran the code, I got the follwing output. Note that results may vary depnding on which features you used to train the model.
+```
+84.86341470763044
+4
+```
+
+So what is going on here? This is the same code we have been using so far, up until the following line:
+```python
+bandwidth = estimate_bandwidth(X, quantile=0.2, n_samples=500)
+print(bandwidth)
+```
+
+The MeanShift algorithm is nice because we do not need to tell it the number of clusters we wish to end up with. Some cases being able to set this would be ideal, however, this is not one of those cases. Instead, we need to come up with the `bandwidth` to train the model with. How this algorithm works, and what badwidth is and does is outside the scope of this tutorial. If you wish to learn more about the MeanShift algorithm, I invite you to check out my latest book which explains how this and other machine learning algorithms work with an example. It can be found at https://www.amazon.com/dp/B08YXWZ4HC.
+
+Next, we build the MeanShift model, and train it using our data:
+```python
+model = MeanShift(bandwidth=bandwidth)
+model.fit(X)
+```
+
+Once training is complete, we can retrieve a list of the labels. This is essentailly a numpy array containing the category each of our training data belongs to. The first item of this array correlates to the first value in our data frame. After getting our labels, we take only unique items from that list, and count the number of unique items. This gives us the number of clusters the algorithm created.
+```python
+labels = model.labels_
+
+labels_unique = np.unique(labels)
+n_clusters = len(labels_unique)
+
+print(n_clusters)
+```
+
+After this is finished, we can merge the labels assigned to each of our training data with our original data frame. This is done with the following code:
+```python
+final_df = df.merge(pd.DataFrame(labels, columns=["result"]), left_index=True, right_index=True)
+```
+
+Here, we stary by converting the predicted lables to a new data frame:
+```python3
+pd.DataFrame(labels, columns=["result"])
+```
+
+Next, we take that data frame, and merge it with our original data frame to get our final data frame.
+
+Once we have our final data frame, we can write that data frame to disk as a new CSV file:
+```python
+final_df.to_csv("cereal_prediction.csv")
+```
+
+The CSV file can be found in the same directory as the python script under the name `cereal_prediction.csv`. I encourage you to open the file in an CSV editor like Excel and see which cereals ended up in the same cluster as other cereals.
+
 ## Part 5 - Graphing the Data
