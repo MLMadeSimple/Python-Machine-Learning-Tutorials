@@ -105,5 +105,84 @@ When this is run, you should get the following output:
 ```
 
 ## Part 3 - Feature Selection
+Now, we must select the features we wish to use in the classification process. The following is a list of features I think are ones we should use. If you disagree, feel free to proceed with using features you think should be used. Remember that there is no right answer in this stage.
+
+- type
+- calories
+- protein
+- fat
+- sodium
+- fiber
+- carbo
+- sugars
+- potass
+- vitamins
+- shelf
+- weight
+- cups
+
+In order to select these features, we will use the following code to store all of that information into the variable `X`. While it is bad practice to use single letter variable names, and variable names should always be lowercase in Python (unless it is a constant), this case is nessisary in order to follow Linear Algebra and Statistics conventions. Note that if you want to use different features than the ones I have selected, feel free to modify the features being selected for training.
+```python
+X = df[[
+    "type", "calories", "protein", "fat", "sodium", "fiber", "carbo", "sugars", "potass",
+    "vitamins", "shelf", "weight", "cups"
+]]
+```
+
+And to select our labels, we can use the following code:
+```python
+y = df["name"]
+```
+
+At this point, our full code looks like this:
+```python
+import pandas as pd
+
+df = pd.read_csv("cereal.csv")
+
+df.loc[df["type"] == "C", 'type'] = 0
+df.loc[df["type"] == "H", 'type'] = 1
+
+X = df[[
+    "type", "calories", "protein", "fat", "sodium", "fiber", "carbo", "sugars", "potass",
+    "vitamins", "shelf", "weight", "cups"
+]]
+
+y = df["name"]
+
+print(X)
+print(y)
+```
+
+And running this should yeild the following output:
+```
+   type  calories  protein  fat  sodium  ...  potass  vitamins  shelf  weight  cups
+0     0        70        4    1     130  ...     280        25      3     1.0  0.33
+1     0       120        3    5      15  ...     135         0      3     1.0  1.00
+2     0        70        4    1     260  ...     320        25      3     1.0  0.33
+3     0        50        4    0     140  ...     330        25      3     1.0  0.50
+4     0       110        2    2     200  ...      -1        25      3     1.0  0.75
+..  ...       ...      ...  ...     ...  ...     ...       ...    ...     ...   ...
+72    0       110        2    1     250  ...      60        25      3     1.0  0.75
+73    0       110        1    1     140  ...      25        25      2     1.0  1.00
+74    0       100        3    1     230  ...     115        25      1     1.0  0.67
+75    0       100        3    1     200  ...     110        25      1     1.0  1.00
+76    0       110        2    1     200  ...      60        25      1     1.0  0.75
+
+[77 rows x 13 columns]
+0                     100% Bran
+1             100% Natural Bran
+2                      All-Bran
+3     All-Bran with Extra Fiber
+4                Almond Delight
+                ...            
+72                      Triples
+73                         Trix
+74                   Wheat Chex
+75                     Wheaties
+76          Wheaties Honey Gold
+Name: name, Length: 77, dtype: object
+```
+
 ## Part 4 - Building the Model
 ## Part 5 - Graphing the Data
