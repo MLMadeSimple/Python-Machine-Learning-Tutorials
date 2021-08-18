@@ -319,7 +319,7 @@ plt.show()
 ```
 
 I got the following graph when I ran this code:
-![img](images/part_5_1.PNG)
+![img](images/part_5_1.png)
 
 Note that the data points do look quite scattered, and certian data points in a cluster look like they should belong to another cluster, but remember that this is just a projection of the 13D data.
 
