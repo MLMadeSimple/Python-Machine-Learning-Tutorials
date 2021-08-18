@@ -10,6 +10,7 @@ The source code for each part can be found in the [GitHub Repository](https://gi
 - [Part 3 - Feature Selection](#part-3---feature-selection)
 - [Part 4 - Building the Model](#part-4---building-the-model)
 - [Part 5 - Graphing the Data](#part-5---graphing-the-data)
+- [Final Code](#final-code)
 
 ## Part 1 - The Data
 The data set which will be used in this tutorial will come from the user [crawford](https://www.kaggle.com/crawford) over on www.kaggle.com and can be found at https://www.kaggle.com/crawford/80-cereals.
@@ -270,3 +271,124 @@ final_df.to_csv("cereal_prediction.csv")
 The CSV file can be found in the same directory as the python script under the name `cereal_prediction.csv`. I encourage you to open the file in an CSV editor like Excel and see which cereals ended up in the same cluster as other cereals.
 
 ## Part 5 - Graphing the Data
+Finally we want to graph our data to see a visual representation of our clusters, but there is a small problem. I chose to use 13 features to train the model. This means that we are working with 13-dimensional data! We can not comprehend what 13-dimensional space looks like, so creating a 13D graph is not an option. Instead, we need to perform a process called "Dimensionality Reduction". The algorithm we will be using to acomplish this task is the Principal Component Analysis (PCA) algorithm.
+
+PCA has the option to reduce the data to 2, 3, or more dimensions. In this tutorial we will use 2 dimensions.
+
+This can be achieved with the follwing code:
+```python
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.decomposition import PCA as sklearnPCA
+
+df = pd.read_csv("cereal.csv")
+
+df.loc[df["type"] == "C", 'type'] = 0
+df.loc[df["type"] == "H", 'type'] = 1
+
+X = df[[
+    "type", "calories", "protein", "fat", "sodium", "fiber", "carbo", "sugars", "potass",
+    "vitamins", "shelf", "weight", "cups"
+]]
+
+y = df["name"]
+
+bandwidth = estimate_bandwidth(X, quantile=0.2, n_samples=500)
+
+model = MeanShift(bandwidth=bandwidth)
+model.fit(X)
+
+labels = model.labels_
+cluster_centers = model.cluster_centers_
+
+labels_unique = np.unique(labels)
+n_clusters = len(labels_unique)
+
+X_norm = (X - X.min())/(X.max() - X.min())
+pca = sklearnPCA(n_components=2)
+transformed = pd.DataFrame(pca.fit_transform(X_norm))
+
+for k in range(n_clusters):
+    class_points = transformed[labels[transformed.index] == k]
+    plt.scatter(class_points[0], class_points[1], label='Class {}'.format(k))
+
+plt.legend()
+plt.show()
+```
+
+I got the following graph when I ran this code:
+**TODO**: Insert Graph
+
+Note that the data points do look quite scattered, and certian data points in a cluster look like they should belong to another cluster, but remember that this is just a projection of the 13D data.
+
+What is going on here? This is the same code as before up until we calculate the matrix norm (stored as `X_norm`) which is done in the following line:
+```python
+X_norm = (X - X.min())/(X.max() - X.min())
+```
+
+From there, we can create our PCA converter like so, and use it to transform our 13 dimensional data down to 2 dimensions.
+```python
+pca = sklearnPCA(n_components=2)
+transformed = pd.DataFrame(pca.fit_transform(X_norm))
+```
+
+Next, for each cluster created, we select teh points which belong to that cluster, and create a scatter plot graph of all the data:
+```python
+for k in range(n_clusters):
+    class_points = transformed[labels[transformed.index] == k]
+    plt.scatter(class_points[0], class_points[1], label='Class {}'.format(k))
+```
+
+Finally, we enable the legend on the graph, and show it:
+```python
+plt.legend()
+plt.show()
+```
+
+## Final Code
+
+Here is the final code created for this tutorial with everything included. I hope you enjoyed this tutorial, and learned something from it. Thanks and have a nice day!
+```python
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.decomposition import PCA as sklearnPCA
+
+df = pd.read_csv("cereal.csv")
+
+df.loc[df["type"] == "C", 'type'] = 0
+df.loc[df["type"] == "H", 'type'] = 1
+
+X = df[[
+    "type", "calories", "protein", "fat", "sodium", "fiber", "carbo", "sugars", "potass",
+    "vitamins", "shelf", "weight", "cups"
+]]
+
+y = df["name"]
+
+bandwidth = estimate_bandwidth(X, quantile=0.2, n_samples=500)
+
+model = MeanShift(bandwidth=bandwidth)
+model.fit(X)
+
+labels = model.labels_
+cluster_centers = model.cluster_centers_
+
+labels_unique = np.unique(labels)
+n_clusters = len(labels_unique)
+
+# Principal Component Analysis (PCA)
+X_norm = (X - X.min())/(X.max() - X.min())
+pca = sklearnPCA(n_components=2)
+transformed = pd.DataFrame(pca.fit_transform(X_norm))
+
+for k in range(n_clusters):
+    class_points = transformed[labels[transformed.index] == k]
+    plt.scatter(class_points[0], class_points[1], label='Class {}'.format(k))
+
+plt.legend()
+plt.show()
+```
