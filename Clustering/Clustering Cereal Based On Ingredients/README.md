@@ -18,6 +18,7 @@ The data set which will be used in this tutorial will come from the user [crawfo
 Crawford, Chris. “80 Cereals.” https://www.kaggle.com/crawford/80-cereals, 2017. 
 
 The following is a small sample of the data which will be used.
+
 | name                      | mfr | type | calories | protein | fat | sodium | fiber | carbo | sugars | potass | vitamins | shelf | weight | cups | rating    | 
 |---------------------------|-----|------|----------|---------|-----|--------|-------|-------|--------|--------|----------|-------|--------|------|-----------| 
 | 100% Bran                 | N   | C    | 70       | 4       | 1   | 130    | 10    | 5     | 6      | 280    | 25       | 3     | 1      | 0.33 | 68.402973 | 
