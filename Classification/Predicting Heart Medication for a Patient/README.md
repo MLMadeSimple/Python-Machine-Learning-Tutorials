@@ -21,7 +21,7 @@ Tripathi, Pratham. “Drug Classification.” Https://Www.kaggle.com/Prathamtrip
 
 The following is a small sample of the data which will be used.
 
-| Age | Sex | BP     | Cholesterol | Na_to_K | Drug  | 
+| Age | Sex | BP | Cholesterol | Na_to_K | Drug | 
 |-----|-----|--------|-------------|---------|-------| 
 | 23  | F   | HIGH   | HIGH        | 25.355  | DrugY | 
 | 47  | M   | LOW    | HIGH        | 13.093  | drugC | 
